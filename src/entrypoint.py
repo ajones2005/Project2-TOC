@@ -1,7 +1,7 @@
-from src.helpers.argument_input import parse_inputs
-from src.helpers.turing_machine import TuringMachineSimulator
-from src.ktape_dtm import KTape_DTM
-from src.ntm_tracer import NTM_Tracer
+from .helpers.argument_input import parse_inputs
+from .helpers.turing_machine import TuringMachineSimulator
+from .ktape_dtm import KTape_DTM
+from .ntm_tracer import NTM_Tracer
 
 
 def main():
@@ -19,3 +19,6 @@ def main():
         # Program 2 (k-tape)
         ktape = KTape_DTM(args.file)
         ktape.run(args.input_string, args.max_depth)
+
+if __name__ == "__main__":
+    main()
