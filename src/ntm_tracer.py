@@ -61,12 +61,14 @@ class NTM_Tracer(TuringMachineSimulator):
         initial_config = ["", self.start_state, input_string]
         root = NTM_Tracer.Config(initial_config, parent=None, transition=None, depth=0)  
 
-        # The tree is a list of lists of configurations
+        # the tree is a list of lists of configurations
         tree = [[root]]
 
         depth = 0
         accepted = False
         accepting_n = None
+        total_transitions = 0
+        max_reject_depth = 0
 
         while depth < max_depth and not accepted:
             current_level = tree[-1]
@@ -81,6 +83,9 @@ class NTM_Tracer(TuringMachineSimulator):
                     accepting_n = n
                     break
                 if q == self.reject_state:
+                    
+                    if n.depth > max_reject_depth:
+                        max_reject_depth = n.depth
                     continue
                 #non-halting
                 read_sym = self.get_head_symbol(n.config)
@@ -98,21 +103,59 @@ class NTM_Tracer(TuringMachineSimulator):
                         depth=depth + 1,
                     )
                     next_level.append(child_n)
+                    total_transitions += 1
             
             if accepted:
                 break
             if not next_level:
-                print("String rejected (all branches halted in reject states or dead ends).")
+                # all paths rejected [cite: 217]
+                print(f"String rejected in {max_reject_depth} steps.")
+                print(f"\nDepth of tree: {depth}")
+                print(f"\nTotal transitions simulated: {total_transitions}")
+                self.print_nondeterminism_degree(tree)
                 return
             
-            tree.append(next_level)  # 
+            tree.append(next_level)
             depth += 1
 
         if accepted:
-            print("String accepted.")
+            print(f"String accepted in {accepting_n.depth} steps.")
             self.print_trace_path(accepting_n)
-        if depth >= max_depth:
-            print(f"Execution stopped after {max_depth} steps.")  # [cite: 259]
+        elif depth >= max_depth:
+            print(f"Execution stopped after {max_depth} steps.")
+
+        print(f"\nDepth of tree: {depth}")
+        print(f"\nTotal transitions simulated: {total_transitions}")
+        self.print_nondeterminism_degree(tree)
+
+    def print_nondeterminism_degree(self, tree):
+        """
+        Calculate and print degree of nondeterminism.
+        Ref: Section 4.3 [cite: 231]
+        Average number of new configurations from each non-halting configuration.
+        """
+        total_configs = 0
+        total_successors = 0
+        
+        for level_idx in range(len(tree) - 1):
+            level = tree[level_idx]
+            next_level = tree[level_idx + 1]
+            
+            non_halting = 0
+            for n in level:
+                left, q, right = n.config
+                if q != self.accept_state and q != self.reject_state:
+                    non_halting += 1
+            
+            if non_halting > 0:
+                total_configs += non_halting
+                total_successors += len(next_level)
+        
+        if total_configs > 0:
+            degree = total_successors / total_configs
+            print(f"Degree of nondeterminism: {degree:.2f}")
+        else:
+            print("Degree of nondeterminism: 1.00 (deterministic)")
 
     def print_trace_path(self, final_node):
         """
@@ -127,13 +170,12 @@ class NTM_Tracer(TuringMachineSimulator):
         path.reverse()
 
         print("=== Accepting path ===")
-        step = 0
-        for n in path:
+        for step, n in enumerate(path):
             left, state, right = n.config
             print(f"Step {step}: ({left!r}, {state}, {right!r})")
             if n.transition is not None:
                 t = n.transition
+                # The previous state is in the parent node
+                prev_state = n.parent.config[1] if n.parent else state
                 read_sym = t['read'][0]
-                print(f"   via: δ({state!r}, {read_sym!r}) -> ({t['next']!r}, {t['write'][0]!r}, {t['move'][0]})")
-            step += 1
-
+                print(f"   via: δ({prev_state!r}, {read_sym!r}) -> ({t['next']!r}, {t['write'][0]!r}, {t['move'][0]})")
