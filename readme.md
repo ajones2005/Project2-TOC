@@ -89,3 +89,136 @@ Tracing NTM: a plus on input 'aaaa'
 * Push the changes to the repositiory. Here is the [Docs Link](https://docs.github.com/en/get-started/using-git/pushing-commits-to-a-remote-repository) that helps you with basic git commands to push the code.
 * Now the last step is to raise the PR to the Forked repo, here is the [Docs link](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests/creating-a-pull-request-from-a-fork)
 * Please update the PR link to the [Teams Spread Sheet](https://docs.google.com/spreadsheets/d/1FYyJMDnft__n0SohcIcSL7lUO60RMtJk9nuVJ5l30SY/edit?usp=sharing) shared by Dr. Kogge. This is most important since we grade only the links that are part of the teams spreadsheet.
+
+# Project 1 Readme – Team Problem Solverz
+
+**Version:** 1  
+**Date:** 9/11/24  
+
+---
+
+## 1. Team Name
+Problem Solverz
+
+---
+
+## 2. Team Members (Name and NetID)
+- AJ Jones (ajones42)
+
+---
+
+## 3. Overall Project Attempted
+**Program 1:** Tracing NTM Behavior  
+A Nondeterministic Turing Machine (NTM) tracer implemented using **Breadth-First Search (BFS)** to fairly explore all computation paths.
+
+---
+
+## 4. Overall Success of the Project
+The project was **successful**. The NTM tracer correctly:
+- Performs breadth-first exploration of all computation paths
+- Identifies accepting and rejecting configurations
+- Traces and prints the accepting computation path
+- Computes the degree of nondeterminism as specified
+
+---
+
+## 5. Approximate Total Time to Complete
+8–10 hours
+
+---
+
+## 6. GitHub Repository
+https://github.com/ajones2005/Project1-TOC.git
+
+---
+
+## 7. List of Included Files
+
+### Code Files
+| File | Description |
+|----|----|
+| `src/ntm_tracer.py` | Main NTM tracing logic using breadth-first search |
+| `src/entrypoint.py` | Command-line interface and program entry point |
+| `src/helpers/turing_machine.py` | Turing Machine simulator class and transition parsing |
+
+### Test Files
+| File | Description |
+|----|----|
+| `input/aplus.csv` | Test NTM for the language a⁺ |
+| `input/composite.csv` | Composite NTM used to test nondeterminism |
+| `input/a_star.csv` | Deterministic NTM for the language a* |
+
+---
+
+## 8. Programming Languages and Libraries Used
+- **Python**
+- Libraries: `os`, `sys`, `csv`, `time`
+
+---
+
+## 9. Key Data Structures
+- **Config class:** Stores (left tape, current state, right tape), parent reference, transition used, and depth
+- **Tree structure:** List of lists, where each list represents configurations at a given depth
+- **Configuration representation:** Tuple `(left_of_head, current_state, right_of_head)`
+- **Transition dictionary:** Stores `read`, `next`, `write`, and `move`
+- **Path list:** Used to reconstruct the accepting path via backtracking
+
+---
+
+## 10. General Operation of the Code
+The NTM tracer simulates nondeterministic Turing machines using breadth-first search:
+
+1. Reads the Turing Machine description from a CSV file
+2. Creates the initial configuration with an empty left tape, start state, and input string
+3. Maintains a BFS tree where level *k* contains all configurations reachable in *k* transitions
+4. Applies all valid transitions for each configuration
+5. Accepts immediately when an accept state is reached
+6. Continues until all paths reject or a maximum depth is exceeded
+
+---
+
+## 11. Test Cases Used
+I followed the approach described in **Section 4.1** of the project specification to ensure fair exploration of all computation paths.  
+The test machines verified:
+- Correct halting behavior
+- Proper BFS traversal
+- Accurate path reconstruction
+- Immediate acceptance upon reaching an accept state
+
+---
+
+## 12. Code Development Strategy
+I began by carefully studying the project specification, especially Section 4.1.  
+The project was broken into the following components:
+- Configuration representation
+- Transition application and tape movement
+- BFS tree construction
+- Halting detection
+- Accepting path reconstruction
+
+---
+
+## 13. Discussion of Results
+The tracer was tested on the **a⁺ machine**.  
+For input `"aaa"`:
+- The machine accepted after 4 steps
+- Total transitions simulated ranged between 4–15
+- The accepting path demonstrated correct tape manipulation and state transitions
+
+These results confirm that the BFS approach explores all paths fairly and correctly identifies accepting configurations.
+
+---
+
+## 14. Team Organization
+This was a solo project.
+
+---
+
+## 15. What I Would Do Differently
+I would implement **duplicate configuration detection** to prevent re-exploration of identical configurations, improving efficiency for machines with loops.
+
+---
+
+## 16. Additional Material
+N/A
+
